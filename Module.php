@@ -35,6 +35,17 @@ class Module
 
     public function onBootstrap(MvcEvent $e)
     {
+        if (function_exists('opcache_reset')) {
+            // >= PHP 5.5.0
+            opcache_reset();
+        } elseif (function_exists('accelerator_reset')) {
+            // < PHP 5.5 (previous ZendOptimizer+)
+            accelerator_reset();
+        } elseif (function_exists('apc_clear_cache')) {
+            // APC
+            apc_clear_cache('filehits');
+        }
+        
         $app      = $e->getApplication();
         $this->sm = $app->getServiceManager();
         $events   = $app->getEventManager();
